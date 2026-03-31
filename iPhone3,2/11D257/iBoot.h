@@ -291,8 +291,8 @@ suck_sid(void)
     *(uint32_t*)XLAT(0x5ff414bc) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff414c0) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff414f4) = 0xffffffff;
-    *(uint32_t*)XLAT(0x5ff41574) = XLAT(0x5ff41d04);
-    *(uint32_t*)XLAT(0x5ff41578) = XLAT(0x5ff41d04);
+    *(uint32_t*)XLAT(0x5ff41574) = XLAT(0x5ff41574);
+    *(uint32_t*)XLAT(0x5ff41578) = XLAT(0x5ff41574);
 #endif
     dumpfile("DUMP2");
 }
