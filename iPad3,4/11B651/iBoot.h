@@ -234,7 +234,7 @@ void
 my_adjust_environ(void)
 {
 #if 1
-    CALL(create_envvar)("boot-ramdisk", "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/1/2/3/4/5/6/7/8/9/0/disk.dmg", 0);
+    CALL(create_envvar)("boot-ramdisk", "/a/b/c/d/e/f/g/h/i/j/k/l/m/disk.dmg", 0);
 #endif
 }
 
@@ -315,7 +315,7 @@ if (1) {
             PUT_WORD_LE(buffer,  0x49F30 +  14 - 0x49ED4, INSNT_LDR_R_PC(2, 80));
             PUT_DWORD_LE(buffer, 0x49F30 +  16 - 0x49ED4, make_bl(1, 0x49F30 + 16, bcopy_ADDR));
             PUT_DWORD_LE(buffer, 0x49F30 +  20 - 0x49ED4, INSNW_MOV_R1_2400);
-            PUT_DWORD_LE(buffer, 0x49F30 +  24 - 0x49ED4, INSNW_STRH_R1_R4_E54);
+            PUT_DWORD_LE(buffer, 0x49F30 +  24 - 0x49ED4, INSNW_STRH_R1_R4_E58);
             PUT_WORD_LE(buffer,  0x49F30 +  28 - 0x49ED4, INSNT_LDR_R_PC(0, 68));
             PUT_DWORD_LE(buffer, 0x49F30 +  30 - 0x49ED4, INSNW_MOV_R1_80000000);
             PUT_WORD_LE(buffer,  0x49F30 +  34 - 0x49ED4, INSNT_STR_R1_R4_R0);
@@ -326,7 +326,7 @@ if (1) {
             PUT_WORD_LE(buffer,  0x49F30 +  46 - 0x49ED4, INSNT_MOV_R_I(1, 0));
             PUT_WORD_LE(buffer,  0x49F30 +  48 - 0x49ED4, INSNT_STR_R1_R0_68);
             PUT_WORD_LE(buffer,  0x49F30 +  50 - 0x49ED4, INSNT_LDR_R_PC(0, 60));
-            PUT_WORD_LE(buffer,  0x49F30 +  52 - 0x49ED4, INSNT_MOV_R_I(1, 0x100));
+            PUT_WORD_LE(buffer,  0x49F30 +  52 - 0x49ED4, INSNT_MOV_R_I(1, 0xFC));
             PUT_WORD_LE(buffer,  0x49F30 +  54 - 0x49ED4, INSNT_LDR_R_PC(2, 60));
             PUT_WORD_LE(buffer,  0x49F30 +  56 - 0x49ED4, INSNT_MOV_R_I(3, nettoyeur_sz));
             PUT_WORD_LE(buffer,  0x49F30 +  58 - 0x49ED4, INSNT_MOV_R_R(5, 0));
@@ -442,7 +442,7 @@ if (1) {
                 }
 #elif 0 /*^_^ for 0x400 NODE_SIZE*/
                 if (seq == 17 * 3 + 1) {
-                    PUT_DWORD_BE(buffer, 140, 0x10000);
+                    PUT_DWORD_BE(buffer, 128, 0x10000);
                     break;
                 }
 #endif
@@ -683,8 +683,9 @@ patch_image(unsigned char *image)
 void
 patch_nettoyeur(unsigned char *nettoyeur)
 {
+    *(void **)(nettoyeur + 0xEC) = image + *(uint32_t *)(nettoyeur + 0xEC) - (IMAGE_LOADADDR + 0x4000000);
+    *(void **)(nettoyeur + 0xF0) = image + *(uint32_t *)(nettoyeur + 0xF0) - (IMAGE_LOADADDR + 0x4000000);
     *(void **)(nettoyeur + 0xF4) = image + *(uint32_t *)(nettoyeur + 0xF4) - (IMAGE_LOADADDR + 0x4000000);
     *(void **)(nettoyeur + 0xF8) = XLAT(*(uint32_t *)(nettoyeur + 0xF8));
-    *(void **)(nettoyeur + 0xFC) = image + *(uint32_t *)(nettoyeur + 0xFC) - (IMAGE_LOADADDR + 0x4000000);
-    *(void **)(nettoyeur + 0x100) = image + *(uint32_t *)(nettoyeur + 0x100) - (IMAGE_LOADADDR + 0x4000000);
+
 }
