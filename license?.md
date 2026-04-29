@@ -7,7 +7,7 @@ License agreement (against dora2-ios's code):
         
     
 License agreement (against Pingzi610's code):  
-    These include dora2-ios own code files in ramdiskI.dmg and "iPod5,1/11B554a", "iPad3,4/",  so these codes add my license.  
+    These include Pingzi610 own code files in ramdiskI.dmg and "iPod5,1/11B554a", "iPad3,4/",  so these codes add my license.  
         
         1, It can be used freely except for 新科科技、新苹果老设备.
         2, However, it is forbidden to use my code as a way to run unauthorized devices such as stolen devices or illegally obtained software.
