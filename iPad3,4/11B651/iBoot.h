@@ -7,7 +7,7 @@
 #define IMAGE_TEXT_END          0xBFF46000 /* XXX this is a lie */
 #define IMAGE_STACK_SIZE        0x1000
 #define IMAGE_LOADADDR          0x80000000
-#define IMAGE_HUGECHUNK         0x13000000
+#define IMAGE_HUGECHUNK         0x10000000 /* ??? */
 
 
 #define breakpoint1_ADDR        (0x1AE5C + 1) /* ResolvePathToCatalogEntry */
