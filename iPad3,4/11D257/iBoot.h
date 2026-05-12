@@ -1,4 +1,4 @@
-#define IMAGE_NAME              "pwned34.bin"
+#define IMAGE_NAME              "iBoot.p101ap.RELEASE.dec"
 #define IMAGE_START             0xBFF00000
 #define IMAGE_END               0xBFF558BC
 #define IMAGE_SIZE              (IMAGE_END - IMAGE_START)
