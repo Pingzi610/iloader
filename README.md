@@ -1,2 +1,3 @@
 iBoot loader by xerub: https://xerub.github.io/ios/iboot/2018/05/10/de-rebus-antiquis.html   
-S5L8940X devices except iPhone 4s 11D257 have problem working. 
+iPhone 4s 11B554a have problem working.   
+iPad 3 11B554a cannot be exploited.
